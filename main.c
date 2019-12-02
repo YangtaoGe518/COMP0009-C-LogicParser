@@ -29,32 +29,9 @@ For binary formulas you will also need functions that return the first part and 
 
 /*You need to change this next bit and include functions for parse, closed and complete.*/ 
 
-char getOperator(char* g){
-    int count = 0;
-    int split = -1;
-    int isProp = 0;
-    for (int i = 0; i < strlen(g); ++i) {
-        if (g[i] == '('){
-            count++;
-        }else if (g[i] == ')'){
-            count--;
-            if (count == 1) {
-                split = i + 1;
-                break;
-            }
-        }else if (g[i] == 'p' || g[i] == 'q' || g[i] == 'r'){
-            isProp = 1;
-        }else if (g[i] == '^' || g[i] == '>' || g[i] == 'v'){
-            if (count == 1 && isProp){
-                split = i;
-                break;
-            }
-        }
-    }
-    return g[split];
-}
 
 
+/*----------------------------------------------------Section 1: Parser----------------------------------------------------------------*/
 // Part one of binary formula
 char* partone(char* g){
     int count = 0;
@@ -144,6 +121,34 @@ int parse(char* name){
     } return 0;
 }
 
+/*----------------------------------------------------Section 2: Tableau----------------------------------------------------------------*/
+
+// obtain the current operator when doing tableau
+char getOperator(char* g){
+    int count = 0;
+    int split = -1;
+    int isProp = 0;
+    for (int i = 0; i < strlen(g); ++i) {
+        if (g[i] == '('){
+            count++;
+        }else if (g[i] == ')'){
+            count--;
+            if (count == 1) {
+                split = i + 1;
+                break;
+            }
+        }else if (g[i] == 'p' || g[i] == 'q' || g[i] == 'r'){
+            isProp = 1;
+        }else if (g[i] == '^' || g[i] == '>' || g[i] == 'v'){
+            if (count == 1 && isProp){
+                split = i;
+                break;
+            }
+        }
+    }
+    return g[split];
+}
+
 char* auxNegation(char* name, int* size){
     while (*size > 2 && name[1] == '-') {
         name += 2;
@@ -152,8 +157,7 @@ char* auxNegation(char* name, int* size){
     return name;
 }
 
-
-char* dealNegation(char* name){
+char* doNegation(char* name){
     int i = strlen(name);
     int* size = &i;
     char* newName = (char*) malloc(sizeof(char) * Fsize);
@@ -202,6 +206,7 @@ char* dealNegation(char* name){
     }
 }
 
+// decide whether it is a terminal: 1 is terminal; 2 is not a terminal
 int isTerminal(char* name){
     if (name == NULL){
         return 1;
@@ -218,46 +223,6 @@ int isTerminal(char* name){
         return 0;
 }
 
-// Closed funtion
-int closed(struct tableau* t) {
-    struct set* set;
-    int isRead[6]; //{p, -p, q, -q, r, -r}
-    int tmp = 0;
-    int isClose = 1;
-    while (t){
-        set = t -> S;
-        for (int i = 0; i < 6; ++i)
-            isRead[i] = 0;
-        while (set){
-            if (strcmp(set -> item, "p") == 0){
-                isRead[0] = 1;
-
-            } else if (strcmp(set -> item, "-p") == 0){
-                isRead[1] = 1;
-            }else if (strcmp(set -> item, "q") == 0){
-                isRead[2] = 1;
-            }else if (strcmp(set -> item, "-q") == 0){
-                isRead[3] = 1;
-            }else if (strcmp(set -> item, "r") == 0){
-                isRead[4] = 1;
-            }else{
-                isRead[5] = 1;
-            }
-            set = set -> tail;
-        }
-        for (int i = 1; i < 6; i+=2) {
-            if (isRead[i] == 1 && isRead[i-1] == 1)
-                tmp = 1;
-        }
-        if (!tmp){
-            return 0;
-        }
-        tmp = 0;
-        t = t -> rest;
-    }
-    return isClose;
-}
-
 
 // Complete function
 void complete(struct tableau* t){
@@ -269,7 +234,7 @@ void complete(struct tableau* t){
         while (set){
             if (!isTerminal(set -> item)){
                 if (set -> item[0] == '-'){
-                    set -> item = dealNegation(set -> item);
+                    set -> item = doNegation(set -> item);
                 }
                 if (isTerminal(set -> item)){
                     set = set -> tail;
@@ -359,7 +324,53 @@ void complete(struct tableau* t){
 
 }
 
+// Closed funtion
+int closed(struct tableau* t) {
+    struct set* set;
+    /* what is read into the set
+        0  1  2  3  4  5
+        p -p  q -q  r -r
+    */
+    int isRead[6]; 
 
+    int tmp = 0;
+    int isClose = 1;
+    while (t){
+        set = t -> S;
+        for (int i = 0; i < 6; ++i)
+            isRead[i] = 0;
+        while (set){
+            if (strcmp(set -> item, "p") == 0){
+                isRead[0] = 1;
+
+            } else if (strcmp(set -> item, "-p") == 0){
+                isRead[1] = 1;
+            }else if (strcmp(set -> item, "q") == 0){
+                isRead[2] = 1;
+            }else if (strcmp(set -> item, "-q") == 0){
+                isRead[3] = 1;
+            }else if (strcmp(set -> item, "r") == 0){
+                isRead[4] = 1;
+            }else{
+                isRead[5] = 1;
+            }
+            set = set -> tail;
+        }
+        for (int i = 1; i < 6; i+=2) {
+            if (isRead[i] == 1 && isRead[i-1] == 1)
+                tmp = 1;
+        }
+        if (!tmp){
+            return 0;
+        }
+        tmp = 0;
+        t = t -> rest;
+    }
+    return isClose;
+}
+
+
+/*----------------------------------------------------Main----------------------------------------------------------------*/
 int main(){
 
     char* name = (char*)malloc(sizeof(char)*Fsize);
