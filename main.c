@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <string.h>   /* for all the new-fangled string functions */
-#include <stdlib.h>     /* malloc, free, rand */
+#include <stdlib.h>   /* malloc, free, rand */
 
 int Fsize=50; /* max string length of formulas*/
 int inputs=10;
@@ -10,23 +10,24 @@ int TabSize=500; /*maximum length of tableau queue, if needed*/
 
 /* A set will contain a list of words. Use NULL for emptyset.  */
 struct set{
-    char *item;/*first word of non-empty set*/
-    struct set *tail;/*remaining words in the set*/
+    char* item;/*first word of non-empty set*/
+    struct set* tail;/*remaining words in the set*/
 };
 
 /* A tableau will contain a list of pointers to sets (of words).  Use NULL for empty list.*/
 struct tableau {
-    struct set * S; /* pointer to first set in non-empty list */
-    struct tableau *rest; /*list of pointers to other sets*/
+    struct set* S; /* pointer to first set in non-empty list */
+    struct tableau* rest; /*list of pointers to other sets*/
 };
 
-/*put all your functions here.  You will need
-1.
+/*put all your functions here. You will need
 int parse(char *g) which returns 1 if a propos ition, 2 if neg, 3 if binary, ow 0
 Of course you will almost certainly need other functions.
 
 For binary formulas you will also need functions that return the first part and the second part of the binary formula.
 */
+
+/*You need to change this next bit and include functions for parse, closed and complete.*/ 
 
 char getOperator(char* g){
     int count = 0;
@@ -54,8 +55,8 @@ char getOperator(char* g){
 }
 
 
-
-char *partone(char *g){
+// Part one of binary formula
+char* partone(char* g){
     int count = 0;
     int split = -1;
     int isProp = 0;
@@ -84,7 +85,8 @@ char *partone(char *g){
     return result;
 }
 
-char *parttwo(char *g){
+// Part two of binary formula
+char* parttwo(char* g){
     int count = 0;
     int split = -1;
     int isProp = 0;
@@ -113,7 +115,7 @@ char *parttwo(char *g){
     return result;
 }
 
-
+// Parse funtion
 int parse(char* name){
     unsigned len = strlen(name);
     int count = 0;
@@ -139,10 +141,10 @@ int parse(char* name){
         else
             return 3;
 
-    } else return 0;
+    } return 0;
 }
 
-char* helpDealNegation(char* name, int* size){
+char* auxNegation(char* name, int* size){
     while (*size > 2 && name[1] == '-') {
         name += 2;
         *size -= 2;
@@ -156,7 +158,7 @@ char* dealNegation(char* name){
     int* size = &i;
     char* newName = (char*) malloc(sizeof(char) * Fsize);
     if (name[1] == '-')
-        name = helpDealNegation(name, size);
+        name = auxNegation(name, size);
     if (name[0] == '-' && i != 2){
         while (name[0] == '-' && *size > 2){
 
@@ -216,7 +218,8 @@ int isTerminal(char* name){
         return 0;
 }
 
-int closed(struct tableau *t) {
+// Closed funtion
+int closed(struct tableau* t) {
     struct set* set;
     int isRead[6]; //{p, -p, q, -q, r, -r}
     int tmp = 0;
@@ -256,8 +259,8 @@ int closed(struct tableau *t) {
 }
 
 
-
-void complete(struct tableau *t){
+// Complete function
+void complete(struct tableau* t){
     struct tableau* table = t;
     struct set* set;
     while (table){
@@ -359,8 +362,8 @@ void complete(struct tableau *t){
 
 int main(){
 
-    char *name = (char*)malloc(sizeof(char)*Fsize);
-/*You should not need to alter the program below.*/
+    char* name = (char*)malloc(sizeof(char)*Fsize);
+    /*You should not need to alter the program below.*/
 
     FILE *fp, *fpout;
     /* reads from input.txt, writes to output.txt*/
