@@ -35,7 +35,7 @@ For binary formulas you will also need functions that return the first part and 
 char *partone(char *g)
 {
     int count = 0;
-    int split = -1;
+    int spliter = -1;
     int isProp = 0;
     for (int i = 0; i < strlen(g); ++i)
     {
@@ -48,7 +48,7 @@ char *partone(char *g)
             count--;
             if (count == 1)
             {
-                split = i + 1;
+                spliter = i + 1;
                 break;
             }
         }
@@ -60,13 +60,13 @@ char *partone(char *g)
         {
             if (count == 1 && isProp)
             {
-                split = i;
+                spliter = i;
                 break;
             }
         }
     }
-    char *result = (char *)malloc(sizeof(char) * (split));
-    for (int i = 1; i < split; ++i)
+    char *result = (char *)malloc(sizeof(char) * (spliter));
+    for (int i = 1; i < spliter; ++i)
     {
         result[i - 1] = g[i];
     }
@@ -77,7 +77,7 @@ char *partone(char *g)
 char *parttwo(char *g)
 {
     int count = 0;
-    int split = -1;
+    int spliter = -1;
     int isProp = 0;
     for (int i = 0; i < strlen(g); ++i)
     {
@@ -90,7 +90,7 @@ char *parttwo(char *g)
             count--;
             if (count == 1)
             {
-                split = i + 1;
+                spliter = i + 1;
                 break;
             }
         }
@@ -102,13 +102,13 @@ char *parttwo(char *g)
         {
             if (count == 1 && isProp)
             {
-                split = i;
+                spliter = i;
                 break;
             }
         }
     }
-    char *result = (char *)malloc(sizeof(char) * (strlen(g) - split));
-    for (int i = split + 1, k = 0; i < strlen(g) - 1; ++i, ++k)
+    char *result = (char *)malloc(sizeof(char) * (strlen(g) - spliter));
+    for (int i = spliter + 1, k = 0; i < strlen(g) - 1; ++i, ++k)
     {
         result[k] = g[i];
     }
@@ -120,7 +120,7 @@ int parse(char *name)
 {
     unsigned len = strlen(name);
     int count = 0;
-    int pairPara = 0;
+    int pairParam = 0;
     int numOfProp = 0;
     for (int i = 0; i < len; ++i)
     {
@@ -136,11 +136,11 @@ int parse(char *name)
         else if (temp == ')')
         {
             count--;
-            pairPara++;
+            pairParam++;
         }
     }
 
-    if (count == 0 && numOfProp == pairPara + 1)
+    if (count == 0 && numOfProp == pairParam + 1)
     {
         if (len == 1)
             return 1;
@@ -158,7 +158,7 @@ int parse(char *name)
 char getOperator(char *g)
 {
     int count = 0;
-    int split = -1;
+    int spliter = -1;
     int isProp = 0;
     for (int i = 0; i < strlen(g); ++i)
     {
@@ -171,7 +171,7 @@ char getOperator(char *g)
             count--;
             if (count == 1)
             {
-                split = i + 1;
+                spliter = i + 1;
                 break;
             }
         }
@@ -183,12 +183,12 @@ char getOperator(char *g)
         {
             if (count == 1 && isProp)
             {
-                split = i;
+                spliter = i;
                 break;
             }
         }
     }
-    return g[split];
+    return g[spliter];
 }
 
 char *auxNegation(char *name, int *size)
@@ -283,6 +283,8 @@ int isTerminal(char *name)
         return 0;
 }
 
+
+/* three aux functions to identify different operator*/
 void auxAndComplete(struct set *set)
 {
     struct set *newSet = (struct set *)malloc(sizeof(struct set));
